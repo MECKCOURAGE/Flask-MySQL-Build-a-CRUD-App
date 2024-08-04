@@ -1,0 +1,57 @@
+% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="mt-4">
+    <form method="POST">
+        <div class="form-group">
+            <textarea class="form-control" name="note" rows="3" placeholder="Add a new note..."></textarea>
+        </div>
+        <button class="btn btn-primary">Add Note</button>
+    </form>
+    <div class="mt-4">
+        {% for note in user.notes %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <p>{{ note.data }}</p>
+                <button class="btn btn-danger" onclick="deleteNote({{ note.id }})">Delete</button>
+                <button class="btn btn-primary" onclick="editNotePrompt({{ note.id }})">Edit</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+<script>
+    function deleteNote(noteId) {
+        fetch('/delete-note', {
+            method: 'POST',
+            body: JSON.stringify({ noteId: noteId }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((_res) => {
+            window.location.href = "/";
+        });
+    }
+
+    function editNotePrompt(noteId) {
+        const newContent = prompt("Edit your note:");
+        if (newContent) {
+            editNote(noteId, newContent);
+        }
+    }
+
+    function editNote(noteId, content) {
+        fetch('/edit-note', {
+            method: 'POST',
+            body: JSON.stringify({ noteId: noteId, content: content }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((_res) => {
+            window.location.href = "/";
+        });
+    }
+</script>
+{% endblock %}
